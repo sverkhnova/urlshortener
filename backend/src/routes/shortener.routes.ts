@@ -33,4 +33,38 @@ router.post('/shorten', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/:alias', async (req: Request, res: Response) => {
+  try {
+    const { alias } = req.params;
+    if (!alias) {
+      res.status(400).json({ error: 'Alias is required' });
+      return;
+    }
+
+    const link = await service.findByAlias(alias);
+    if (!link) {
+      res.status(404).json({ error: 'Short link not found' });
+      return;
+    }
+
+    // Проверяем, не просрочена ли ссылка
+    if (link.expiresAt && link.expiresAt < new Date()) {
+      // Можно вернуть статус 410 (Gone) или 400, как решите
+      res.status(410).json({ error: 'Short link has expired' });
+      return;
+    }
+
+    // Увеличиваем clickCount
+    await service.incrementClickCount(link);
+
+    // Редирект на originalUrl
+    res.redirect(link.originalUrl);
+    return;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
+  }
+});
+
 export default router;
