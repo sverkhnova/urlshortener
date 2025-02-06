@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { ShortLink } from './entities/ShortLink';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -8,8 +9,6 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'url_shortener',
-  // Позже добавим entities, например: [ShortLink, ...]
-  entities: [],
-  // Для dev-окружения можно оставить true, на продакшне лучше false + миграции
+  entities: [ShortLink],
   synchronize: true
 });
