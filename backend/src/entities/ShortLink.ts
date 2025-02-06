@@ -8,14 +8,23 @@ export class ShortLink {
   @Column()
   originalUrl!: string;
 
-  @Column({ type: 'varchar',nullable: true, unique: true, length: 20 })
-  alias!: string | null;
+  @Column({
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+    unique: true
+  })
+  alias!: string;
 
   @CreateDateColumn()
   createdAt!: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  expiresAt!: Date | null;
+  @Column({
+    type: 'timestamp',
+    default: () => "NOW() + interval '1 days'", 
+    nullable: false
+  })
+  expiresAt!: Date;
 
   @Column({ default: 0 })
   clickCount!: number;

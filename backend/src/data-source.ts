@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { ShortLink } from './entities/ShortLink';
+import 'dotenv/config'
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
