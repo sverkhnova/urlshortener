@@ -27,8 +27,7 @@
    ```
    {
     "originalUrl": "https://example.com",
-    "alias"?: ,
-    "expiresAt"?: "2025-01-15T12:00:00Z" 
+    "alias"?: , 
    }
    ```
 
