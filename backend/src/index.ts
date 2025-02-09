@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Подключаем наш роут
+// подключаем наш роут
 app.use('/', shortenerRoutes);
 
 AppDataSource.initialize()
