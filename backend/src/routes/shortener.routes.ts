@@ -16,17 +16,25 @@ router.post('/shorten', async (req: Request, res: Response) => {
 
     const createdLink = await service.createShortLink(originalUrl, alias);
 
-    // Возвращаем данные. expiresAt уже в базе хранится (через SQL default)
+    const shortUrl = `${req.protocol}://${req.get('host')}/${createdLink.alias}`;
+
+    // возвращаем данные
     res.status(201).json({
       id: createdLink.id,
       originalUrl: createdLink.originalUrl,
+      shortUrl,
       alias: `http://localhost:3000/${createdLink.alias}`,
       createdAt: createdLink.createdAt,
-      expiresAt: createdLink.expiresAt, // TypeORM загрузит это поле после save()
+      expiresAt: createdLink.expiresAt,
       clickCount: createdLink.clickCount,
     });
     return;
   } catch (error) {
+    // если это ошибка 23505 (дубликат alias), возвращаем соответствующий статус (409)
+    if ((error as any).code === '23505') {
+      res.status(409).json({ error: 'Alias already in use' });
+      return;
+    }
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
     return;
@@ -47,17 +55,17 @@ router.get('/:alias', async (req: Request, res: Response) => {
       return;
     }
 
-    // Проверяем, не просрочена ли ссылка
+    // проверяем, не просрочена ли ссылка
     if (link.expiresAt && link.expiresAt < new Date()) {
-      // Можно вернуть статус 410 (Gone) или 400, как решите
+      // можно вернуть статус 410 (Gone) или 400
       res.status(410).json({ error: 'Short link has expired' });
       return;
     }
 
-    // Увеличиваем clickCount
+    // увеличиваем clickCount
     await service.incrementClickCount(link);
 
-    // Редирект на originalUrl
+    // редирект на originalUrl
     res.redirect(link.originalUrl);
     return;
   } catch (error) {
