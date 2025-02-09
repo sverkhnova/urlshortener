@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../app'; // см. пояснение, нужно экспортировать `app` отдельно
+import { app } from '../app'; 
 import { AppDataSource } from '../data-source';
 import { ShortLink } from '../entities/ShortLink';
 import { Analytics } from '../entities/Analytics';
