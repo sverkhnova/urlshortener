@@ -2,7 +2,6 @@ version: '3.8'
 services:
   db:
     image: postgres:14-alpine
-    container_name: url_shortener_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -14,7 +13,6 @@ services:
 
   backend:
     build: ./backend
-    container_name: url_shortener_backend
     ports:
       - '3000:3000'
     environment:
@@ -25,6 +23,13 @@ services:
       DB_NAME: url_shortener
     depends_on:
       - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3001:80'
+    depends_on:
+      - backend
 
 volumes:
   db-data:
