@@ -67,4 +67,61 @@ router.get('/:alias', async (req: Request, res: Response) => {
   }
 });
 
+// GET /info/:alias
+router.get('/info/:alias', async (req: Request, res: Response) => {
+  try {
+    const { alias } = req.params;
+    if (!alias) {
+      res.status(400).json({ error: 'Alias is required' });
+      return;
+    }
+
+    const link = await service.findByAlias(alias);
+    if (!link) {
+      res.status(404).json({ error: 'Short link not found' });
+      return;
+    }
+
+    // Возвращаем нужные поля
+    res.json({
+      id: link.id,
+      originalUrl: link.originalUrl,
+      alias: link.alias,
+      createdAt: link.createdAt,
+      expiresAt: link.expiresAt,
+      clickCount: link.clickCount,
+    });
+    return;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
+  }
+});
+
+// DELETE /delete/:alias
+router.delete('/delete/:alias', async (req: Request, res: Response) => {
+  try {
+    const { alias } = req.params;
+    if (!alias) {
+      res.status(400).json({ error: 'Alias is required' });
+      return;
+    }
+
+    const success = await service.deleteByAlias(alias);
+    if (!success) {
+      res.status(404).json({ error: 'Short link not found' });
+      return;
+    }
+
+    res.json({ message: 'Short link deleted' });
+    return;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
+  }
+});
+
+
 export default router;
