@@ -20,7 +20,7 @@ router.post('/shorten', async (req: Request, res: Response) => {
     res.status(201).json({
       id: createdLink.id,
       originalUrl: createdLink.originalUrl,
-      alias: createdLink.alias,
+      alias: `http://localhost:3000/${createdLink.alias}`,
       createdAt: createdLink.createdAt,
       expiresAt: createdLink.expiresAt, // TypeORM загрузит это поле после save()
       clickCount: createdLink.clickCount,
@@ -115,6 +115,31 @@ router.delete('/delete/:alias', async (req: Request, res: Response) => {
     }
 
     res.json({ message: 'Short link deleted' });
+    return;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
+  }
+});
+
+// GET /analytics/:alias
+router.get('/analytics/:alias', async (req: Request, res: Response) => {
+  try {
+    const { alias } = req.params;
+    if (!alias) {
+      res.status(400).json({ error: 'Alias is required' });
+      return;
+    }
+    const result = await service.getAnalytics(alias);
+    if (!result) {
+      res.status(404).json({ error: 'Short link not found' });
+      return;
+    }
+    res.json({
+      clickCount: result.clickCount,
+      lastIps: result.lastIps,
+    });
     return;
   } catch (error) {
     console.error(error);

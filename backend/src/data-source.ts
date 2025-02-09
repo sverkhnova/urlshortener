@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { ShortLink } from './entities/ShortLink';
+import { Analytics } from './entities/Analytics';
 import 'dotenv/config'
 
 export const AppDataSource = new DataSource({
@@ -10,6 +11,6 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'url_shortener',
-  entities: [ShortLink],
+  entities: [ShortLink, Analytics],
   synchronize: true
 });
